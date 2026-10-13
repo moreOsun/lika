@@ -3,7 +3,7 @@
   'use strict';
 
   var STORE_KEY = 'ck_checkin_data_v1';
-  var CK_VERSION = 'v12-multi'; // 单文件版由 build-standalone.js 自动替换为打包时间戳
+  var CK_VERSION = 'v13-multi'; // 单文件版由 build-standalone.js 自动替换为打包时间戳
 
   // ---------- 安全存储（file:// 下 localStorage 可能被禁用，降级为内存，避免脚本抛错中断） ----------
   var LS = (function () {
@@ -483,8 +483,7 @@
     form.startDate = task ? (task.startDate || '') : '';
     form.endDate = task ? (task.endDate || '') : '';
     document.getElementById('ck-f-cycle').value = form.cycle;
-    document.getElementById('ck-f-start').value = form.startDate;
-    document.getElementById('ck-f-end').value = form.endDate;
+    updateFieldButton('start'); updateFieldButton('end');
     syncCycleUI();
     syncWeekdayUI();
     syncColorUI();
@@ -527,12 +526,83 @@
     });
   }
 
+  // ---------- 自定义日期选择器（替原生 date input，兼容旧内核） ----------
+  var dpModal = document.getElementById('ck-modal-datepicker');
+  var pickerTarget = 'start';
+  var pickerView = { y: 0, m: 0 };
+
+  function parseYmd(s) { var a = String(s).split('-'); return new Date(+a[0], (+a[1]) - 1, +a[2]); }
+  function getFormDate(t) { return t === 'start' ? form.startDate : form.endDate; }
+  function setFormDate(t, v) { if (t === 'start') form.startDate = v; else form.endDate = v; }
+
+  function updateFieldButton(target) {
+    var btn = document.getElementById('ck-f-' + target + '-btn');
+    if (!btn) return;
+    var val = getFormDate(target);
+    if (val) { btn.textContent = val; btn.classList.add('ck-has'); }
+    else { btn.textContent = '未设置 · 永久'; btn.classList.remove('ck-has'); }
+  }
+
+  function renderPicker() {
+    var y = pickerView.y, m = pickerView.m;
+    document.getElementById('ck-picker-month').textContent = y + '年' + (m + 1) + '月';
+    var grid = document.getElementById('ck-picker-grid');
+    grid.innerHTML = '';
+    var todayStr = ymd(new Date());
+    var selVal = getFormDate(pickerTarget);
+    var blanks = (new Date(y, m, 1).getDay() + 6) % 7; // 周一起始
+    var last = new Date(y, m + 1, 0).getDate();
+    var i;
+    for (i = 0; i < blanks; i++) {
+      var b = document.createElement('div'); b.className = 'ck-picker-day ck-blank'; grid.appendChild(b);
+    }
+    for (var d = 1; d <= last; d++) {
+      (function (d) {
+        var ds = y + '-' + pad(m + 1) + '-' + pad(d);
+        var cell = document.createElement('div'); cell.className = 'ck-picker-day';
+        var num = document.createElement('span'); num.className = 'ck-pk-num'; num.textContent = d;
+        if (ds === todayStr) cell.classList.add('ck-today');
+        if (ds === selVal) cell.classList.add('ck-sel');
+        cell.addEventListener('click', function () {
+          setFormDate(pickerTarget, ds); updateFieldButton(pickerTarget); closePicker();
+        });
+        cell.appendChild(num); grid.appendChild(cell);
+      })(d);
+    }
+  }
+
+  function openPicker(target) {
+    pickerTarget = target;
+    var cur = getFormDate(target);
+    var base = cur ? parseYmd(cur) : new Date();
+    pickerView = { y: base.getFullYear(), m: base.getMonth() };
+    document.getElementById('ck-picker-title').textContent = target === 'start' ? '选择开始日期' : '选择结束日期';
+    renderPicker();
+    dpModal.classList.remove('ck-hidden');
+  }
+  function closePicker() { dpModal.classList.add('ck-hidden'); }
+  function shiftMonth(n) {
+    pickerView.m += n;
+    if (pickerView.m < 0) { pickerView.m = 11; pickerView.y--; }
+    else if (pickerView.m > 11) { pickerView.m = 0; pickerView.y++; }
+    renderPicker();
+  }
+
+  document.getElementById('ck-f-start-btn').addEventListener('click', function () { openPicker('start'); });
+  document.getElementById('ck-f-end-btn').addEventListener('click', function () { openPicker('end'); });
+  document.getElementById('ck-picker-prev').addEventListener('click', function () { shiftMonth(-1); });
+  document.getElementById('ck-picker-next').addEventListener('click', function () { shiftMonth(1); });
+  document.getElementById('ck-picker-cancel').addEventListener('click', closePicker);
+  document.getElementById('ck-picker-clear').addEventListener('click', function () {
+    setFormDate(pickerTarget, ''); updateFieldButton(pickerTarget); closePicker();
+  });
+
   document.getElementById('ck-btn-save').addEventListener('click', function () {
     var name = document.getElementById('ck-f-name').value.trim();
     if (!name) { toast('请填写事项名称'); return; }
     if (form.cycle === 'custom' && !form.weekdays.length) { toast('请至少选择一天'); return; }
-    var startDate = document.getElementById('ck-f-start').value || '';
-    var endDate = document.getElementById('ck-f-end').value || '';
+    var startDate = form.startDate || '';
+    var endDate = form.endDate || '';
     if (startDate && endDate && startDate > endDate) { toast('结束日期不能早于开始日期'); return; }
     if (editing) {
       editing.name = name; editing.cycle = form.cycle;
