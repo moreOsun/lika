@@ -276,6 +276,12 @@ html, body {
 .ck-field-row > * + * { margin-left: 12px; }
 .ck-field-half { flex: 1; min-width: 0; }
 .ck-date-tip { font-size: 11px; color: var(--ck-sub); margin: -8px 0 16px; line-height: 1.5; }
+.ck-date-field {
+  width: 100%; padding: 11px 12px; border: 1px solid var(--ck-line);
+  border-radius: 10px; font-size: 14px; background: #fafbfd; text-align: left;
+  color: var(--ck-text); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ck-date-field.ck-has { background: #eef3ff; border-color: var(--ck-primary); color: var(--ck-primary); font-weight: 600; }
 
 .ck-color-row { display: flex; }
 .ck-color-row > * + * { margin-left: 12px; }
@@ -337,3 +343,36 @@ html, body {
   text-align: center; font-size: 11px; color: #b9c0cf;
   padding: 10px 0 6px; cursor: pointer; -webkit-user-select: none; user-select: none;
 }
+
+/* ---------- 自定义日期选择器（替原生 date input） ---------- */
+#ck-modal-datepicker { z-index: 55; }
+.ck-picker-panel {
+  background: #fff; width: 100%; max-width: 320px; border-radius: 18px;
+  padding: 18px 16px 16px; box-shadow: 0 12px 40px rgba(20,30,60,.18);
+  animation: ck-pop .18s ease;
+}
+.ck-picker-panel h3 { font-size: 15px; text-align: center; margin: 0 0 12px; color: var(--ck-text); }
+.ck-picker-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.ck-picker-nav > span { font-size: 15px; font-weight: 600; color: var(--ck-text); }
+.ck-picker-arrow {
+  border: 1px solid var(--ck-line); background: #fafbfd; width: 34px; height: 34px;
+  border-radius: 8px; font-size: 20px; line-height: 1; color: var(--ck-text); cursor: pointer;
+}
+.ck-picker-weekdays { display: flex; margin-bottom: 4px; }
+.ck-picker-weekdays > * { flex: 0 0 14.2857%; text-align: center; font-size: 12px; color: var(--ck-sub); }
+.ck-picker-grid { display: flex; flex-wrap: wrap; }
+.ck-picker-day {
+  flex: 0 0 14.2857%; box-sizing: border-box; height: 42px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.ck-picker-day.ck-blank { cursor: default; }
+.ck-picker-day .ck-pk-num {
+  width: 32px; height: 32px; line-height: 32px; text-align: center;
+  border-radius: 50%; font-size: 14px; color: var(--ck-text); cursor: pointer;
+}
+.ck-picker-day.ck-blank .ck-pk-num { cursor: default; }
+.ck-picker-day.ck-today .ck-pk-num { box-shadow: inset 0 0 0 1px var(--ck-primary); color: var(--ck-primary); }
+.ck-picker-day.ck-sel .ck-pk-num { background: var(--ck-primary); color: #fff; }
+.ck-picker-btns { display: flex; margin-top: 16px; }
+.ck-picker-btns > * + * { margin-left: 12px; }
+.ck-picker-btns button { flex: 1; }
