@@ -1,5 +1,5 @@
 /* ================= Service Worker - 离线缓存 ================= */
-var CACHE = 'ck-checkin-v13';
+var CACHE = 'ck-checkin-v14';
 var ASSETS = [
   './',
   './index.html',
