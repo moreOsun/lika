@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#4f7cff">
+  <meta name="application-name" content="轻打卡">
+  <meta name="description" content="轻打卡 Lika — 极简每日打卡，记录生活。">
+  <title>轻打卡 Lika</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ============ 今日打卡 ============ -->
+  <section id="ck-view-today" class="ck-view ck-active">
+    <header class="ck-hd">
+      <div class="ck-brand">轻打卡<span class="ck-brand-en">Lika</span></div>
+      <h1 id="ck-today-date">--</h1>
+      <p id="ck-today-progress" class="ck-hd-sub">今日待打卡 0 项</p>
+    </header>
+    <main class="ck-body">
+      <div class="ck-quote" id="ck-quote-card" title="点击换一句">
+        <div class="ck-quote-hd">
+          <span class="ck-quote-style" id="ck-quote-style">今日</span>
+          <span class="ck-quote-date" id="ck-quote-date"></span>
+          <button type="button" id="ck-quote-swap" class="ck-quote-swap" aria-label="换一句">换一句 ⟳</button>
+        </div>
+        <p class="ck-quote-text" id="ck-quote-text">--</p>
+      </div>
+      <ul id="ck-task-list" class="ck-task-list"></ul>
+      <div id="ck-today-empty" class="ck-empty ck-hidden">
+        <p>今天没有需要打卡的事项</p>
+        <button class="ck-btn-ghost" data-nav="ck-view-manage">去添加事项 →</button>
+      </div>
+    </main>
+  </section>
+
+  <!-- ============ 打卡记录（周/月汇总） ============ -->
+  <section id="ck-view-stats" class="ck-view">
+    <header class="ck-hd">
+      <div class="ck-hd-row">
+        <h1>打卡记录</h1>
+        <div class="ck-seg" id="ck-seg-mode">
+          <button data-mode="week" class="ck-on">按周</button>
+          <button data-mode="month">按月</button>
+        </div>
+      </div>
+      <div class="ck-nav-row">
+        <button id="ck-btn-prev" class="ck-btn-round">‹</button>
+        <span id="ck-stats-period">--</span>
+        <button id="ck-btn-next" class="ck-btn-round">›</button>
+        <button id="ck-btn-backtoday" class="ck-btn-mini">回到当前</button>
+      </div>
+    </header>
+    <main class="ck-body">
+      <div class="ck-card ck-summary">
+        <div class="ck-sum-item"><b id="ck-sum-done">0</b><span>已打卡</span></div>
+        <div class="ck-sum-item"><b id="ck-sum-plan">0</b><span>应打卡</span></div>
+        <div class="ck-sum-item"><b id="ck-sum-rate">--</b><span>完成率</span></div>
+        <div class="ck-sum-item"><b id="ck-sum-streak">0</b><span>连续天数</span></div>
+      </div>
+      <div class="ck-card">
+        <h3 class="ck-card-title">日历视图 <small>颜色区分完成度，格内数字为已打/应打，点击某日可补打卡</small></h3>
+        <div id="ck-calendar" class="ck-calendar"></div>
+        <div class="ck-legend">
+          <span class="ck-lg ck-lg-none"></span>无应打卡
+          <span class="ck-lg ck-lg-zero"></span>未完成
+          <span class="ck-lg ck-lg-partial"></span>部分完成
+          <span class="ck-lg ck-lg-full"></span>全部完成
+        </div>
+      </div>
+      <div class="ck-card">
+        <h3 class="ck-card-title">各事项完成情况</h3>
+        <ul id="ck-task-stats" class="ck-task-stats"></ul>
+      </div>
+    </main>
+  </section>
+
+  <!-- ============ 事项管理 ============ -->
+  <section id="ck-view-manage" class="ck-view">
+    <header class="ck-hd">
+      <h1>事项管理</h1>
+      <button id="ck-btn-add" class="ck-btn-primary">＋ 新增事项</button>
+    </header>
+    <main class="ck-body">
+      <h3 class="ck-sec-title">进行中 <small id="ck-active-count"></small></h3>
+      <ul id="ck-manage-list" class="ck-manage-list"></ul>
+      <div id="ck-archived-wrap" class="ck-hidden">
+        <h3 class="ck-sec-title ck-sec-muted">已终止事项 <small id="ck-archived-count"></small></h3>
+        <p class="ck-tip">终止 = 停止每日打卡，历史记录仍保留在“记录”中；如需彻底清除请在此单独操作。</p>
+        <ul id="ck-archived-list" class="ck-manage-list"></ul>
+      </div>
+      <div class="ck-card">
+        <h3 class="ck-card-title">数据备份</h3>
+        <div class="ck-backup-row">
+          <button id="ck-btn-export" class="ck-btn-ghost">导出备份</button>
+          <button id="ck-btn-import" class="ck-btn-ghost">导入备份</button>
+          <input type="file" id="ck-file-import" accept=".json" class="ck-hidden">
+        </div>
+        <p class="ck-tip">数据保存在本机浏览器中，清除浏览器数据会丢失，建议定期导出备份。</p>
+      </div>
+      <p id="ck-version-line" class="ck-version-line">轻打卡 Lika</p>
+      <br>
+    </main>
+  </section>
+
+  <!-- ============ 新增/编辑事项弹层 ============ -->
+  <div id="ck-modal-edit" class="ck-modal ck-hidden">
+    <div class="ck-modal-panel">
+      <h2 id="ck-modal-title">新增事项</h2>
+      <label class="ck-field">
+        <span>事项名称</span>
+        <input type="text" id="ck-f-name" maxlength="20" placeholder="例如：晨跑 30 分钟">
+      </label>
+      <label class="ck-field">
+        <span>打卡周期</span>
+        <select id="ck-f-cycle">
+          <option value="daily">每天</option>
+          <option value="weekday">工作日（周一至周五）</option>
+          <option value="weekend">周末（周六、周日）</option>
+          <option value="custom">每周指定几天</option>
+        </select>
+      </label>
+      <div id="ck-f-weekdays" class="ck-weekdays ck-hidden">
+        <button data-d="1">一</button><button data-d="2">二</button><button data-d="3">三</button>
+        <button data-d="4">四</button><button data-d="5">五</button><button data-d="6">六</button><button data-d="0">日</button>
+      </div>
+      <div class="ck-field-row">
+        <label class="ck-field ck-field-half">
+          <span>开始日期（可选）</span>
+          <input type="date" id="ck-f-start">
+        </label>
+        <label class="ck-field ck-field-half">
+          <span>结束日期（可选）</span>
+          <input type="date" id="ck-f-end">
+        </label>
+      </div>
+      <p class="ck-date-tip">两者留空即为“永久”；可只填开始日或只填结束日。</p>
+      <div class="ck-field">
+        <span>颜色标记</span>
+        <div class="ck-color-row" id="ck-f-colors">
+          <i data-c="#4f7cff" class="ck-on"></i><i data-c="#2ec48b"></i><i data-c="#ff9f43"></i>
+          <i data-c="#ee5a6f"></i><i data-c="#9b59b6"></i><i data-c="#54a0ff"></i>
+        </div>
+      </div>
+      <div class="ck-modal-btns">
+        <button id="ck-btn-cancel" class="ck-btn-ghost">取消</button>
+        <button id="ck-btn-save" class="ck-btn-primary">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 某日详情弹层（补打卡） ============ -->
+  <div id="ck-modal-day" class="ck-modal ck-hidden">
+    <div class="ck-modal-panel">
+      <h2 id="ck-day-title">--</h2>
+      <ul id="ck-day-list" class="ck-task-list"></ul>
+      <div class="ck-modal-btns">
+        <button id="ck-btn-day-close" class="ck-btn-ghost">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 通用确认弹框 ============ -->
+  <div id="ck-modal-confirm" class="ck-modal ck-modal-center ck-hidden">
+    <div class="ck-confirm-panel">
+      <h3 id="ck-confirm-title">请确认</h3>
+      <p id="ck-confirm-msg"></p>
+      <div class="ck-confirm-btns">
+        <button id="ck-confirm-cancel" class="ck-btn-ghost">取消</button>
+        <button id="ck-confirm-ok" class="ck-confirm-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 底部导航 ============ -->
+  <nav class="ck-tabbar">
+    <button data-view="ck-view-today" class="ck-on"><span class="ck-tab-ico">✓</span><span>今日</span></button>
+    <button data-view="ck-view-stats"><span class="ck-tab-ico">▦</span><span>记录</span></button>
+    <button data-view="ck-view-manage"><span class="ck-tab-ico">☰</span><span>管理</span></button>
+  </nav>
+
+  <div id="ck-toast" class="ck-toast ck-hidden"></div>
+
+  <script src="quotes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
