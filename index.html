@@ -130,14 +130,14 @@
         <button data-d="4">四</button><button data-d="5">五</button><button data-d="6">六</button><button data-d="0">日</button>
       </div>
       <div class="ck-field-row">
-        <label class="ck-field ck-field-half">
+        <div class="ck-field ck-field-half">
           <span>开始日期（可选）</span>
-          <input type="date" id="ck-f-start">
-        </label>
-        <label class="ck-field ck-field-half">
+          <button type="button" class="ck-date-field" id="ck-f-start-btn" data-target="start">未设置 · 永久</button>
+        </div>
+        <div class="ck-field ck-field-half">
           <span>结束日期（可选）</span>
-          <input type="date" id="ck-f-end">
-        </label>
+          <button type="button" class="ck-date-field" id="ck-f-end-btn" data-target="end">未设置 · 永久</button>
+        </div>
       </div>
       <p class="ck-date-tip">两者留空即为“永久”；可只填开始日或只填结束日。</p>
       <div class="ck-field">
@@ -173,6 +173,26 @@
       <div class="ck-confirm-btns">
         <button id="ck-confirm-cancel" class="ck-btn-ghost">取消</button>
         <button id="ck-confirm-ok" class="ck-confirm-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 自定义日期选择器（替原生 date input，兼容旧内核） ============ -->
+  <div id="ck-modal-datepicker" class="ck-modal ck-modal-center ck-hidden">
+    <div class="ck-picker-panel">
+      <h3 id="ck-picker-title">选择日期</h3>
+      <div class="ck-picker-nav">
+        <button type="button" id="ck-picker-prev" class="ck-picker-arrow">&#8249;</button>
+        <span id="ck-picker-month"></span>
+        <button type="button" id="ck-picker-next" class="ck-picker-arrow">&#8250;</button>
+      </div>
+      <div class="ck-picker-weekdays">
+        <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+      </div>
+      <div id="ck-picker-grid" class="ck-picker-grid"></div>
+      <div class="ck-picker-btns">
+        <button type="button" id="ck-picker-clear" class="ck-btn-ghost">清除（永久）</button>
+        <button type="button" id="ck-picker-cancel" class="ck-btn-ghost">取消</button>
       </div>
     </div>
   </div>
